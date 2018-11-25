@@ -8,27 +8,7 @@ Page({
    */
   data: {
     chargingRecordList:[
-      {
-        chargingStartTime:"2990-99-09",
-        chargingStatus:"1",
-        powerBankNO:"23432435435345",
-        chargingTimeAmount:"7",
-        chargingCost:"2",
-      },
-      {
-        chargingStartTime: "2990-99-09",
-        chargingStatus: "1",
-        powerBankNO: "23432435435345",
-        chargingTimeAmount: "7",
-        chargingCost: "2",
-      },
-      {
-        chargingStartTime: "2990-99-09",
-        chargingStatus: "1",
-        powerBankNO: "23432435435345",
-        chargingTimeAmount: "7",
-        chargingCost: "2",
-      }
+      
     ]
   },
 

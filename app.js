@@ -11,8 +11,8 @@ App({
     userinfo:"userinfo",
     serverPhoneNo:"076985251988",
     version:"v1.0.5",
-    // ip:"http://www.qdtechwx.com:8081",
-    ip:"http://192.168.0.112:8081",
+    ip:"http://www.qdtechwx.com:8081",
+    // ip:"http://192.168.0.112:8081",
     // ip:"http://192.168.0.105:8081",
   // },
   },
@@ -127,7 +127,7 @@ App({
       }
     })
   },
-  onLaunch:function(res){
+  onLaunch: function(options){
     var that = this;
     wx.getNetworkType({
       success: function(res) {
@@ -144,7 +144,19 @@ App({
       }
       console.log(that.data.networkStatus)
     })
-    //查看是否有更新  
+    //获取二维码值
+      // my.alert({
+      //   title: 'app onLaunch',
+      //   content: JSON.stringify(options),
+      //   success: (res) => {
+      //     //成功处理代码段
+      //   },
+      // });
+      //获取关联普通二维码的码值，放到全局变量qrCode中
+      if (options.query && options.query.qrCode) {
+        console.log("qrCode:"+options.query.qrCode);
+        this.data.qrCode = options.query.qrCode;
+      }
   },
   checkVersion:function(){
     const updateManager = wx.getUpdateManager()

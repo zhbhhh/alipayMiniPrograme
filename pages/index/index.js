@@ -23,6 +23,9 @@ Page({
   onReady(e) {
     
   },
+  onHide:function(res){
+    clearInterval(this.data.timer);
+  },
   onShow:function(e){
     this.checkOrder();
   },
@@ -191,7 +194,8 @@ Page({
                 controls: cc,
                 chargingFlag: true
               })
-              // that.startTimer();
+              console.log("有正在进行的订单，开启定时器");
+              that.startTimer();
             }
           },
           fail: function(res) { },
@@ -225,13 +229,9 @@ Page({
     my.getStorage({
       key: app.constants.userinfo,
       success: function(res) {
-        var userinfo = JSON.parse(res.data);
-        // wx.showLoading({
-        //   title: '',
-        // })
-        //获取skey成功，访问接口获取数据
+        var userinfo = res.data;
         my.httpRequest({
-          url: app.constants.ip + "/wechat/user/backPowerBank",
+          url: app.constants.ip + "/alipay/user/backPowerBank",
           data: {
             skey: userinfo.skey,
             // skey: "skey9876543222",
@@ -241,7 +241,7 @@ Page({
           dataType: 'json',
           responseType: 'text',
           success: function(res) {
-            console.log(res)
+            console.log("首页：："+JSON.stringify(res))
             if (res.data.flag == "1") { //用户可借用充电宝,表示充电宝已归还
               clearInterval(that.data.timer);//清楚计时器
               //恢复扫码充电图标
@@ -254,19 +254,24 @@ Page({
               //处理订单结果
               if (res.data.data.payStatus == "1") {  //表示已支付
                 if (res.data.data.transactionSource == "3") {//3表示交易源为余额,4表示免费
-                  wx.showModal({
+                  my.confirm({
                     title: '充电宝归还成功',
                     content: '本次消费' + res.data.data.payAmount + '元，已从余额扣除',
                   })
                 } else if (res.data.data.transactionSource == "4") {//本次充电免费
-                  wx.showModal({
+                  my.confirm({
                     title: '充电宝归还成功',
                     content: '本次充电免费',
+                  })
+                } else if (res.data.data.transactionSource == "6") {//支付方式为资金冻结自动扣除
+                  my.confirm({
+                    title: '充电宝归还成功',
+                    content: '本次消费' + res.data.data.payAmount + '元，已从冻结资金中扣除，剩余的金额已原路退回至您的账户中。',
                   })
                 }
               } else { //表示未支付
                 if (res.data.data.payAmount != "0") {
-                  wx.showModal({
+                  my.confirm({
                     title: '充电完成',
                     content: '本次消费' + res.data.data.payAmount + '元，是否立即支付',
                     success: function(e) {

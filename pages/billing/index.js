@@ -112,66 +112,63 @@ Page({
     }, 1000)
   },
   //实时访问是否归还充电宝
-  checkBackPowerBank:function(e){
+  checkBackPowerBank: function(e) {
     var that = this;
     my.getStorage({
       key: app.constants.userinfo,
-      success: function (res) {
+      success: function(res) {
         var userinfo = res.data;
-        if(userinfo==null || userinfo == undefined) return;
-        // wx.showLoading({
-        //   title: '',
-        // })
-        //获取skey成功，访问接口获取数据
         my.httpRequest({
-          url: app.constants.ip + "/wechat/user/backPowerBank",
+          url: app.constants.ip + "/alipay/user/backPowerBank",
           data: {
             skey: userinfo.skey,
+            // skey: "skey9876543222",
           },
           header: {},
           method: 'POST',
           dataType: 'json',
           responseType: 'text',
-          success: function (res) {
-            console.log(res)
+          success: function(res) {
+            console.log("计时页面：：" + JSON.stringify(res))
             if (res.data.flag == "1") { //用户可借用充电宝,表示充电宝已归还
               clearInterval(that.data.timer);//清楚计时器
-              that.setData({
-                billing: "本次充电耗时",
-                disabled: true
-              })
+              //恢复扫码充电图标
               //处理订单结果
               if (res.data.data.payStatus == "1") {  //表示已支付
                 if (res.data.data.transactionSource == "3") {//3表示交易源为余额,4表示免费
-                      my.confirm({
-                        title: '支付宝归还成功',
-                        content: '本次消费'+res.data.data.payAmount+'元，已从余额扣除',
-                      })
-                } else if (res.data.data.transactionSource == "4"){//本次充电免费
                   my.confirm({
-                    title: '支付宝归还成功',
+                    title: '充电宝归还成功',
+                    content: '本次消费' + res.data.data.payAmount + '元，已从余额扣除',
+                  })
+                } else if (res.data.data.transactionSource == "4") {//本次充电免费
+                  my.confirm({
+                    title: '充电宝归还成功',
                     content: '本次充电免费',
                   })
+                } else if (res.data.data.transactionSource == "6") {//支付方式为资金冻结自动扣除
+                  my.confirm({
+                    title: '充电宝归还成功',
+                    content: '本次消费' + res.data.data.payAmount + '元，已从冻结资金中扣除，剩余的金额已原路退回至您的账户中。',
+                  })
                 }
-              }else{ //表示未支付
+              } else { //表示未支付
                 if (res.data.data.payAmount != "0") {
                   my.confirm({
                     title: '充电完成',
-                    content: '本次消费' + res.data.data.payAmount +'元，是否立即支付',
-                    success: function (e) {
-                      console.log(e);
+                    content: '本次消费' + res.data.data.payAmount + '元，是否立即支付',
+                    success: function(e) {
                       if (e.confirm) //用户点击了确定按钮,再调用支付接口
-                      that.handleOrder(res.data.data.payAmount);
+                        that.handleOrder(res.data.data.payAmount);
                     }
                   })
                 }
-              } 
+              }
             } else {  //用户不能借用充电宝，1.用户未交押金，2.用户有未支付的订单，3.用户有正在借用的订单。
-              
+
             }
           },
-          fail: function (res) { },
-          complete: function (res) { },
+          fail: function(res) { },
+          complete: function(res) { },
         })
       },
     })

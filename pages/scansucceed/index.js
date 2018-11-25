@@ -32,7 +32,17 @@ Page({
   onLoad: function (options) {
     var that = this;
     // this.checkSession();
-    var q = options.q;
+    console.log("扫码::"+JSON.stringify(options));
+    // var q = "";
+    if (JSON.stringify(options) == "{}"){
+      console.log("111111");
+     var q = app.data.qrCode;
+    }else{
+      console.log("2222222");
+     var q = options.q;
+    }
+    // var q = options.q;
+    console.log("二维码："+q);
     if (q != "undefined" && q !="") {
       // console.log("全局onLaunch onload url=" + q)
       // console.log("全局onLaunch onload 参数 flag=" + utils.getQueryString(q, 'sn'))
@@ -119,139 +129,6 @@ Page({
    */
   onShareAppMessage: function () {
 
-  },
-  commit:function(e){
-    var that = this;
-    that.setData({
-      killShake :true,
-    })
-    
-    // my.redirectTo({
-    //   url: '/pages/billing/index', // 需要跳转的应用内非 tabBar 的目标页面路径 ,路径后可以带参数。参数规则如下：路径与参数之间使用
-    //   success: (res) => {
-        
-    //   },
-    // });
-
-    my.getStorage({
-      key: app.constants.userinfo,
-      success: function (res) { //表示用户已登录，可进行扫码
-        var userinfo = JSON.parse(res.data);
-        my.showLoading({
-          title: '',
-          mask:true,
-        })
-        //先访问接口是否正在充电，防止多次借用充电宝
-        my.httpRequest({
-          url: app.constants.ip + "/alipay/user/firstPage/scanBorrow",
-          data: {
-            skey: userinfo.skey,
-            deviceNO: that.data.deviceNo,
-            formId1: that.data.formId1,
-            formId2: that.data.formId2,
-          },
-          header: {},
-          method: 'POST',
-          dataType: 'json',
-          responseType: 'text',
-          success: function (res) {
-            console.log(res);
-            if (res.data.flag == "1" && res.data.code == "1"){ //用户可借用充电宝
-              my.redirectTo({
-                url: '/pages/billing/index',
-              })
-              my.confirm({
-                title: '充电宝已弹出',
-                content: '请及时取走您的充电宝!',
-                success: function (e) {
-                },
-                fail: function (e) {
-                  console.log(e);
-                }
-              })
-            } else if (res.data.flag == "0" && res.data.code == "1"){  //用户不能借用充电宝，1.用户未交押金，2.用户有未支付的订单，3.用户有正在借用的订单。
-              that.setData({
-                killShake: false,
-              })
-              if(res.data.data == null || res.data.data==''){ //如果data数据为空，则表示押金未交或无充电宝可借
-                if (res.data.msg === '当前充电箱无法借出充电宝'){//无充电宝可借
-                  my.confirm({
-                    title: res.data.msg,
-                    content: '',
-                  })
-                }else{  //押金未交
-                  my.redirectTo({
-                    url: '/pages/deposit/index',
-                  })
-                }
-                
-              }else {
-                if (res.data.data.order != undefined && res.data.data.order.powerBankStatus == "0") { //powerBankStatus=0表示正在充电
-                  my.confirm({
-                    title: '借用充电宝失败',
-                    content: '您有正在进行的订单',
-                    success: function (e) {
-                    }
-                  })
-                //powerBankStatus=1用户已还充电宝，payStatus=0表示有未支付
-                ////powerBankStatus=1并且payStatus=0表示有未支付的订单
-                } else if (res.data.data.powerBankStatus == "1" && res.data.data.payStatus=="0"){
-                  if(res.data.data.payAmount != "0"){
-                    my.confirm({
-                      title: '您有未支付的订单',
-                      content: '是否立即支付',
-                      success:function(e){
-                        if (e.confirm) //用户点击了确定按钮
-                        that.handleOrder(res.data.data.payAmount);
-                      }
-                    })
-                  }
-                }
-              }
-            } else if (res.data.flag == "0" && res.data.code == "0"){
-              my.confirm({
-                title: '借出充电宝失败',
-                content: res.data.msg,
-              })
-              that.setData({
-                killShake: false,
-              })
-            }else{
-              that.setData({
-                killShake: false,
-              })
-              my.confirm({
-                title: res.data.msg,
-                content: '',
-              })
-            }
-          },
-          fail: function (res) {
-            console.log(res)
-            that.setData({
-              killShake: false,
-            })
-            my.confirm({
-              title: '借用充电宝失败，请稍后重试',
-              duration:3000,
-            })
-           },
-          complete: function (res) { 
-            my.hideLoading();
-            
-          },
-        })
-
-      },
-      fail: function () {    //用户未登录，跳转到登录界面
-        my.navigateTo({
-          url: '/pages/login/index',
-        })
-        that.setData({
-          killShake: false,
-        })
-      }
-    })
   },
   handleOrder:function(money){
     my.getStorage({
@@ -365,8 +242,8 @@ Page({
               deviceNO: that.data.deviceNo
             },
             success: (res) => {
-              console.log("资金冻结访问自己服务器成功");
-              that.alipayFreezing(res.data.data.orderStr);
+              console.log("资金冻结访问自己服务器成功"+JSON.stringify(res));
+              that.alipayFreezing(res.data.data);
             },
           });
         }
@@ -378,6 +255,7 @@ Page({
   },
   alipayFreezing: function(orderStr) {
     var that = this;
+    console.log("orderStr::"+orderStr);
     my.tradePay({
       orderStr: orderStr,
       success: (res) => {
@@ -385,9 +263,17 @@ Page({
         // my.alert({
         //   content: res,
         // });
+        // console.log(res);
         //资金冻结成功，申请借充电宝
         console.log("资金冻结成功，用户借用充电宝");
-        that.borrowCB();
+        if(res.resultCode == 9000){
+          that.borrowCB();
+        }else{  //支付失败，恢复状态
+          that.setData({
+            killShake: false,
+          })
+        }
+        
       }, fail: function(res) {
         my.hideLoading();
         my.alert({
@@ -474,7 +360,7 @@ Page({
               })
               my.confirm({
                 title: res.data.msg,
-                content: '',
+                content: 'jjjj',
               })
             }
           },
@@ -483,7 +369,7 @@ Page({
             that.setData({
               killShake: false,
             })
-            my.showToast({
+            my.confirm({
               title: '借用充电宝失败，请稍后重试',
               duration: 3000,
             })
@@ -517,6 +403,15 @@ Page({
       key: app.constants.userinfo,
       success: function(res) { //表示用户已登录，可进行扫码
         var userinfo = res.data;
+        if(userinfo == null){
+          my.redirectTo({
+            url: '/pages/login/index', // 需要跳转的应用内非 tabBar 的目标页面路径 ,路径后可以带参数。参数规则如下：路径与参数之间使用
+            success: (res) => {
+              
+            },
+          });
+          return;
+        }
         //先访问接口是否正在充电，防止多次借用充电宝
         my.showLoading({
           success: (res) => {
