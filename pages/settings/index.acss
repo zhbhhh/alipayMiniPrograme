@@ -1,0 +1,16 @@
+page{
+ background-color: #F7F7F7;
+}
+
+.setting-view{
+  margin-top: 2rpx;
+}
+
+.setting-button{
+  margin-top: 10vh;
+  color: #fff;
+  border-radius: 40px;
+  margin-left: 10%;
+  margin-right: 10%;
+  background: #5EC5F2;
+}

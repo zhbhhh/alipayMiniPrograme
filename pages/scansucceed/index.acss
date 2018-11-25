@@ -1,0 +1,96 @@
+/* pages/borrowdetail.wxss */
+.shop-image{
+  height: 35vh;
+  background:#5EC5F2;
+  width: 100%;
+}
+.shop-addr{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+.shop-name{
+  font-size: 16px;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 80%;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp:2;
+}
+.right-image{
+  height: 80rpx;
+  width: 80rpx;
+}
+.divLine{
+ background: #E0E3DA;
+ width: 96%;
+ height: 2rpx;
+ margin-left: 2%;
+ 
+}
+.divLine.bottom{
+  margin-top: 10rpx;
+}
+.divLine.top{
+  margin-bottom: 10rpx;
+}
+.money{
+  font-size: 30px;
+}
+.price{
+  display: flex;
+  justify-content: center;
+  margin-top: 60rpx;
+  position: relative;
+}
+.hour{
+  font-size: 30px;
+  position: relative;
+  bottom: 0rpx;
+}
+.price-dec{
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  margin-top: 30rpx;
+}
+.commit-borrow{
+  background: #5EC5F2;
+  color: #fff;
+  border-radius: 50rpx;
+  margin-left: 10%;
+  margin-right: 10%;
+  position: absolute;
+  bottom: 16vh;
+  width: 80%;
+}
+.back-home{
+  background: #5EC5F2;
+  color: #fff;
+  border-radius: 50rpx;
+  margin-left: 10%;
+  margin-right: 10%;
+  position: absolute;
+  bottom: 5vh;
+  width: 80%;
+}
+.title-log{
+  width: 100rpx;
+  height: 100rpx;
+  
+}
+.header-view{
+  height: 40vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.header-view view{
+  margin-top: 20rpx;
+}

@@ -1,0 +1,43 @@
+<view class="about-view">
+  <image class="logo-image" src="{{logo}}"></image>
+  <text>Q电</text>
+</view>
+
+<view class="mid-view">
+  <view class="item">
+    <image class="logo-style" src="/images/phone.png"></image>
+    <view class="about-tablen">
+      <view class="about-view1">
+        <text>客服电话</text>
+        <text class="right-text">{{phone}}</text>
+      </view>
+      <view class="divLine"> </view>
+    </view>
+  </view>
+
+  <view class="item">
+    <image style="width:33rpx;height:23rpx;margin-left:5%;" src="/images/email.png"></image>
+    <view class="about-tablen">
+      <view class="about-view1">
+        <text>电子邮箱</text>
+        <text class="right-text">{{email}}</text>
+      </view>
+      <view class="divLine"> </view>
+    </view>
+  </view>
+
+  <view class="item">
+    <image class="logo-style" src="/images/net.png"></image>
+    <view class="about-tablen">
+      <view class="about-view1">
+        <text>官方网站</text>
+        <text class="right-text">{{net}}</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<view class="bottom">
+  <text>{{name}}</text>
+</view>
+

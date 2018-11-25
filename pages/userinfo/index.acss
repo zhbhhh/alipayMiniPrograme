@@ -1,0 +1,50 @@
+page{
+  background-color: #fff;
+}
+.userinfo-header{
+  height: 30vh;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+}
+.userinfo-image{
+  display: flex;
+  align-items: center;
+}
+.inte-text{
+  display: flex;
+  align-items: center;
+}
+.userinfo-header image{
+	display: block;
+	width: 180rpx;
+	height: 180rpx;
+	border-radius: 50%;
+	margin:50rpx;
+	box-shadow: 0 0 20rpx rgba(0,0,0,.2)
+}
+.userinfo-style1{
+  display: flex;
+  margin-right: 50rpx;
+  align-items: center;
+}
+.userinfo-style1 view{
+  display: flex;
+  align-items: center;
+}
+.userinfo-style1 view text{
+  margin-left: 20rpx;
+}
+
+.c-g{
+  display: flex;
+	/* padding-top: 5rpx; */
+  font-size: 10px;
+  align-items: center;
+}
+.c-f{
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+
+}

@@ -1,0 +1,22 @@
+<!--pages/billing/index.wxml-->
+<view class="container">
+    <view class="number">
+        <text hidden="true">当前充电宝编号: {{powerbankNumber}}</text>
+    </view>
+    <view class="time">
+        <view class="time-title">
+            <text>{{billing}}</text>
+        </view>
+        <view class="time-content">
+            <text>{{hours}}:{{minuters}}:{{seconds}}</text>
+        </view>
+    </view>
+
+    <!-- <view>
+      {{backType}}
+    </view> -->
+
+    <view class="endride">   
+        <button class="back-home" onTap="moveToIndex">回到地图</button>
+    </view>
+</view>

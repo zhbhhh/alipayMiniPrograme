@@ -1,0 +1,29 @@
+
+
+
+<view class="deposit-header">
+<view class="child-view"><text class="child-text">{{money}}</text><text>元</text></view>
+  <view class="child-view1">充值押金</view>
+  <view class="child-view1" hidden="{{depositStatus===1}}">借取充电宝需要先缴纳押金哦</view>
+</view>
+
+<view class="deposit-mid">
+  <view class="weixinpay">
+    <image class="paylogo" src="/images/alipay.png"></image>
+    <text>支付宝支付</text>
+    <icon class="choice" type="success"></icon>
+  </view>
+  <view class="divLine"> </view>
+  <view class="mid-text">
+    <view class="dot"></view>
+    <view class="text-style">通过支付宝充值，申请退款后，押金可退。</view>
+  </view>
+
+  <view class="mid-text">
+    <view class="dot"></view>
+    <view class="text-style">因为网络问题，押金到账可能会存在延迟，如有疑问请联系客服</view>
+  </view>
+  
+  <button class="recharge-button" disabled="{{killShake}}" onTap="recharge">{{depositStatusValue}}</button>
+
+</view>

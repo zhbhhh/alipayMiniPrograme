@@ -1,0 +1,13 @@
+<view class="map-page">
+  <!-- <view class="user">
+    <view class="user-name" onTap="goOrderList">
+      <image class="avatar" src="{{user.avatar}}" background-size="cover"></image>
+      <view class="nickname">{{user.nickName}}</view>
+      <view class="nicktext">你的订单在此查看哦～</view>
+      <image class="to-right" src="../../images/to-right.png" background-size="cover" mode="aspectFit"></image>
+    </view>
+  </view> -->
+  <view class="map-view">
+    <map style="height: 100%" id="shop-map" show-location markers="{{markers}}" controls="{{controls}}" onMarkerTap="goRentalPoint"  onControlTap="goTodos"></map>
+  </view>
+</view>

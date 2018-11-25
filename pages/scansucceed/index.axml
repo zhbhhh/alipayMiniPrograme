@@ -1,0 +1,23 @@
+<!--pages/borrowdetail.wxml-->
+<view class="header-view">
+  <image class="title-log" src="/images/scan_succeed.png"></image>
+  <view>扫码成功</view>
+</view>
+  <image a:if="{{false}}" class="shop-image" src="{{shopImage}}"></image>
+
+<view class="divLine top"></view>
+<view class="shop-addr" a:if="{{false}}">
+  <text class="shop-name">{{shop.shopName}} ({{shop.address}})</text>
+  <image class="right-image" src="/images/right_arrow.jpg"></image>
+</view>
+<view class="price">
+  <view class="money">￥{{money}}</view><view class="hour">/小时</view>
+</view>
+<view class="price-dec">{{freeMin}}分钟内免费 每天封顶{{maxCost}}元</view>
+
+<view class="divLine bottom"></view>
+
+<button disabled="{{killShake}}" class="commit-borrow" onTap="commit">确定使用</button>
+
+<button disabled="{{killShake}}" class="back-home" onTap="backHome">返回首页</button>
+

@@ -1,0 +1,31 @@
+.container{
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	background-color: #fff;
+}
+.number,.endride{
+	padding: 60rpx 0;
+	width: 100%;
+	text-align: center;
+}
+.time{
+	text-align: center;
+	width: 100%;
+}
+.time .time-content{
+	font-size: 100rpx;
+}
+
+.back-home{
+  background: #5EC5F2;
+  color: #fff;
+  border-radius: 50rpx;
+  margin-left: 10%;
+  margin-right: 10%;
+  position: absolute;
+  bottom: 5vh;
+  width: 80%;
+}

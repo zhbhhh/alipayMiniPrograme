@@ -1,0 +1,24 @@
+<!--pages/rechargerecord/index.wxml-->
+<scroll-view class="scroll">
+  <view class="father-view" a:for="{{chargingRecordList}}" a:key="index" a:for-item="item">
+    <view class="item-view">
+      <text class="item-time">{{item.chargingStartTime}}</text>
+      <view class="item-state" a:if="{{item.chargingStatus == 1}}">充电完成</view>
+       <view class="item-state" a:else="{{item.chargingStatus == 0}}">正在充电</view>
+      <text class="eqnum">充电宝编号: {{item.powerBankNO}}</text>
+      <view class="bottom-view">
+        <view class="duration-view">
+          <image class="image" src="/images/rechargetime.png"></image>
+          <text class="duration">充电时长: {{item.chargingTimeAmount}}分钟</text>
+        </view>
+
+        <view class="cost-view">
+          <image class="image" src="/images/cost.png"></image>
+          <text class="cost">充电花费: {{item.chargingCost}}元</text>
+        </view>      
+      </view>
+      <view class="divLine"></view>
+    </view>
+  </view>
+</scroll-view>
+<view a:if="{{chargingRecordList.length==0}}" class="no-record">无记录！</view>

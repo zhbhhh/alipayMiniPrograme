@@ -1,0 +1,11 @@
+<view class="tapbar">
+<text>版本</text>
+<text>{{version}}</text>
+</view>
+
+<view class="setting-view tapbar" onTap="about">
+<text>关于Q电</text>
+<text>></text>
+</view>
+
+<button class="setting-button" onTap="quite_login">退出登录</button>
