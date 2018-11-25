@@ -17,7 +17,21 @@
 
 <view class="divLine bottom"></view>
 
-<button disabled="{{killShake}}" class="commit-borrow" onTap="commit">确定使用</button>
+<!-- <button disabled="{{killShake}}" class="commit-borrow" onTap="commit">确定使用</button> -->
+
+<form onSubmit="submitInfo" report-submit='true' >
+  <button form-type="submit" disabled='{{killShake}}' class='btn' bindtap='commit'>确定使用      
+    <view class="vv">
+      <form onSubmit="formSubmit" report-submit="true">
+        <button disabled='{{killShake}}' form-Type="submit" class='btn'>
+          <view disabled='{{killShake}}' class="vv"> 
+             确定使用            
+          </view>
+        </button>
+      </form>
+    </view>
+  </button>
+</form>
 
 <button disabled="{{killShake}}" class="back-home" onTap="backHome">返回首页</button>
 

@@ -94,3 +94,26 @@
 .header-view view{
   margin-top: 20rpx;
 }
+
+.vv {
+  background: #5EC5F2;
+  color: #fff;
+  border-radius: 50rpx;
+  position: fixed;
+  bottom: 16vh;
+  width: 80%;
+  margin-left: 5%;
+  /* margin-right: 10%; */
+}
+
+
+.btn {
+  width: 0rpx;
+  height: 0rpx;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  position:absolute;
+  background: rgba(0, 155, 0, 0.5);
+  top: 0;
+}

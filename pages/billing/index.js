@@ -18,60 +18,12 @@ Page({
 // 页面加载
   onLoad:function(options){
     
-      this.startTimer();
+      // this.startTimer();
   },
   onShow:function(e){
     var that = this;
     console.log("onshow");
-    // if (this.data.isLocalPage){
-    // if (true){
-    //   this.data.isLocalPage = false;
-    //   my.getStorage({
-    //     key: app.constants.userinfo,
-    //     success: (res) => { //表示用户已登录，可进行扫码
-    //       // var userinfo = JSON.parse(res.data);
-    //       //先访问接口是否正在充电，防止多次借用充电宝
-    //       console.log("billing:" + JSON.stringify(res));
-    //       wx: wx.request({
-    //         url: app.constants.ip + "/wechat/user/firstPage/scanBorrow",
-    //         data: {
-    //           skey: userinfo.skey,
-    //           // deviceNO: ""
-    //         },
-    //         header: {},
-    //         method: 'POST',
-    //         dataType: 'json',
-    //         responseType: 'text',
-    //         success: function (res) {
-    //           console.log(res);
-    //           if (res.data.flag == "1") { //用户可借用充电宝
-
-    //           } else {  //用户不能借用充电宝，1.用户未交押金，2.用户有未支付的订单，3.用户有正在借用的订单。
-    //             if (res.data.data == null || res.data.data == '') { //如果data数据为空，则表示押金未交
-
-    //             } else {
-    //               if (res.data.data.order.powerBankStatus != undefined && res.data.data.order.powerBankStatus == "0") { //powerBankStatus=0表示正在充电
-    //                 that.setData({
-    //                   powerbankNumber: res.data.data.order.powerBankId
-    //                 })
-    //                 that.startTimer(res.data.data.currentUseTime);
-    //                 ////powerBankStatus=1并且payStatus=0表示有未支付的订单
-    //               } else if (res.data.data.powerBankStatus == "1" && res.data.data.payStatus == "0") {
-
-    //               }
-    //             }
-    //           }
-    //         },
-    //         fail: function (res) { },
-    //         complete: function (res) { },
-    //       })
-
-    //     },
-    //     fail: function () {    //用户未登录，跳转到登录界面
-
-    //     }
-    //   })
-    // }
+    this.getChargingTime();
   },
   onHide:function(e){
     console.log("页面隐藏");
@@ -81,7 +33,7 @@ Page({
   onUnload:function(e){
     clearInterval(this.data.timer);
   },
-// 结束骑行，清除定时器
+// 结束充电，清除定时器
   endRide: function(){
     clearInterval(this.data.timer);
     this.timer = "";
@@ -162,19 +114,19 @@ Page({
   //实时访问是否归还充电宝
   checkBackPowerBank:function(e){
     var that = this;
-    wx.getStorage({
+    my.getStorage({
       key: app.constants.userinfo,
       success: function (res) {
-        var userinfo = JSON.parse(res.data);
+        var userinfo = res.data;
+        if(userinfo==null || userinfo == undefined) return;
         // wx.showLoading({
         //   title: '',
         // })
         //获取skey成功，访问接口获取数据
-        wx: wx.request({
+        my.httpRequest({
           url: app.constants.ip + "/wechat/user/backPowerBank",
           data: {
             skey: userinfo.skey,
-            // skey: "skey9876543222",
           },
           header: {},
           method: 'POST',
@@ -191,19 +143,19 @@ Page({
               //处理订单结果
               if (res.data.data.payStatus == "1") {  //表示已支付
                 if (res.data.data.transactionSource == "3") {//3表示交易源为余额,4表示免费
-                      wx.showModal({
+                      my.confirm({
                         title: '支付宝归还成功',
                         content: '本次消费'+res.data.data.payAmount+'元，已从余额扣除',
                       })
                 } else if (res.data.data.transactionSource == "4"){//本次充电免费
-                  wx.showModal({
+                  my.confirm({
                     title: '支付宝归还成功',
                     content: '本次充电免费',
                   })
                 }
               }else{ //表示未支付
                 if (res.data.data.payAmount != "0") {
-                  wx.showModal({
+                  my.confirm({
                     title: '充电完成',
                     content: '本次消费' + res.data.data.payAmount +'元，是否立即支付',
                     success: function (e) {
@@ -225,12 +177,12 @@ Page({
     })
   },
   handleOrder: function (money) {
-    wx.getStorage({
+    my.getStorage({
       key: app.constants.userinfo,
       success: function (res) {
-        var userinfo = JSON.parse(res.data);
+        var userinfo = res.data;
         //获取skey成功，访问接口获取数据
-        wx: wx.request({
+        my.httpRequest({
           url: app.constants.ip + "/wechat/user/firstPage/personalCenter/myWallet/recharge",
           data: {
             skey: userinfo.skey,
@@ -244,29 +196,11 @@ Page({
           success: function (res) {
             if (res.data.code == "1") {
               console.log(res);
-              wx.requestPayment({
-                timeStamp: res.data.data.timeStamp,
-                nonceStr: res.data.data.nonceStr,
-                package: res.data.data.package,
-                signType: res.data.data.signType,
-                paySign: res.data.data.paySign,
-                success: function (e) { //支付成功
-                  console.log(e)
-                  wx.navigateBack({
-                    delta:99
-                  })
-                },
-                fail: function (e) { //支付失败
-                  console.log(e)
-                  wx.showToast({
-                    title: '支付失败',
-                    duration: 2000,
-                  })
-                }
-              })
+              //调用支付
+
             } else { //接口返回code=0 失败
               console.log(res);
-              wx.showToast({
+              my.confirm({
                 title: '支付失败',
                 duration: 2000
               })
@@ -280,4 +214,33 @@ Page({
       },
     })
   },
+  getChargingTime:function(res){
+    var that = this;
+    my.getStorage({
+      key: app.constants.userinfo, // 缓存数据的key
+      success: (res) => {
+        if(res.data != null){
+          console.log("请求后台获取时间:" + app.constants.ip + "/alipay/user/firstPage/userStatus/userOrderDoing");
+          my.httpRequest({
+            url: app.constants.ip + "/alipay/user/firstPage/userStatus/userOrderDoing", // 目标服务器url
+            data:{
+              skey:res.data.skey,
+            },
+            success: (res) => {
+              console.log("shijian:"+JSON.stringify(res));
+              if (res.data.data.status == 1){
+                that.startTimer(res.data.data.useTime);
+              }else{
+                my.navigateBack({
+                  delta:99
+                });
+              }
+            },fail:function(res){
+              console.log("fail:" + JSON.stringify(res));
+            }
+          });
+        }
+      },
+    });
+  }
 })

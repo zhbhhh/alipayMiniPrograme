@@ -142,11 +142,13 @@ Page({
           mask:true,
         })
         //先访问接口是否正在充电，防止多次借用充电宝
-        wx: wx.request({
+        my.httpRequest({
           url: app.constants.ip + "/alipay/user/firstPage/scanBorrow",
           data: {
             skey: userinfo.skey,
-            deviceNO: that.data.deviceNo
+            deviceNO: that.data.deviceNo,
+            formId1: that.data.formId1,
+            formId2: that.data.formId2,
           },
           header: {},
           method: 'POST',
@@ -155,10 +157,10 @@ Page({
           success: function (res) {
             console.log(res);
             if (res.data.flag == "1" && res.data.code == "1"){ //用户可借用充电宝
-              wx.redirectTo({
+              my.redirectTo({
                 url: '/pages/billing/index',
               })
-              wx.showModal({
+              my.confirm({
                 title: '充电宝已弹出',
                 content: '请及时取走您的充电宝!',
                 success: function (e) {
@@ -173,19 +175,19 @@ Page({
               })
               if(res.data.data == null || res.data.data==''){ //如果data数据为空，则表示押金未交或无充电宝可借
                 if (res.data.msg === '当前充电箱无法借出充电宝'){//无充电宝可借
-                  wx.showModal({
+                  my.confirm({
                     title: res.data.msg,
                     content: '',
                   })
                 }else{  //押金未交
-                  wx.redirectTo({
+                  my.redirectTo({
                     url: '/pages/deposit/index',
                   })
                 }
                 
               }else {
                 if (res.data.data.order != undefined && res.data.data.order.powerBankStatus == "0") { //powerBankStatus=0表示正在充电
-                  wx.showModal({
+                  my.confirm({
                     title: '借用充电宝失败',
                     content: '您有正在进行的订单',
                     success: function (e) {
@@ -195,7 +197,7 @@ Page({
                 ////powerBankStatus=1并且payStatus=0表示有未支付的订单
                 } else if (res.data.data.powerBankStatus == "1" && res.data.data.payStatus=="0"){
                   if(res.data.data.payAmount != "0"){
-                    wx.showModal({
+                    my.confirm({
                       title: '您有未支付的订单',
                       content: '是否立即支付',
                       success:function(e){
@@ -207,7 +209,7 @@ Page({
                 }
               }
             } else if (res.data.flag == "0" && res.data.code == "0"){
-              wx.showModal({
+              my.confirm({
                 title: '借出充电宝失败',
                 content: res.data.msg,
               })
@@ -218,7 +220,7 @@ Page({
               that.setData({
                 killShake: false,
               })
-              wx.showModal({
+              my.confirm({
                 title: res.data.msg,
                 content: '',
               })
@@ -229,20 +231,20 @@ Page({
             that.setData({
               killShake: false,
             })
-            wx.showToast({
+            my.confirm({
               title: '借用充电宝失败，请稍后重试',
               duration:3000,
             })
            },
           complete: function (res) { 
-            wx.hideLoading();
+            my.hideLoading();
             
           },
         })
 
       },
       fail: function () {    //用户未登录，跳转到登录界面
-        wx.navigateTo({
+        my.navigateTo({
           url: '/pages/login/index',
         })
         that.setData({
@@ -252,12 +254,12 @@ Page({
     })
   },
   handleOrder:function(money){
-    wx.getStorage({
+    my.getStorage({
       key: app.constants.userinfo,
       success: function (res) {
         var userinfo = JSON.parse(res.data);
         //获取skey成功，访问接口获取数据
-        wx: wx.request({
+        my.httpRequest({
           url: app.constants.ip + "/wechat/user/firstPage/personalCenter/myWallet/recharge",
           data: {
             skey: userinfo.skey,
@@ -337,68 +339,55 @@ Page({
     })
   },
   backHome:function(res){
-    // wx.redirectTo({
-    //   url: '/pages/index/index',
-    // })
+    wx.redirectTo({
+      url: '/pages/index/index',
+    })
+  },
+  zjdj:function(res){
     var that = this;
-
-    
+    that.setData({
+      killShake: true,
+    })
 
     my.getStorage({
-      key:app.constants.userinfo,
-      success:function(res){
+      key: app.constants.userinfo,
+      success: function(res) {
         // var userinfo = JSON.parse(res.data);
-        console.log("userinfo:" + JSON.stringify(res.data));
-        if(res.data != null){
+        // console.log("userinfo:" + JSON.stringify(res.data));
+        if (res.data != null) {
           my.showLoading({
             title: ""
           })
           my.httpRequest({
             url: app.constants.ip + "/alipay/user/firstPage/fundFreeze", // 目标服务器url
-            data:{
-              skey:res.data.skey,
-              deviceNO:that.data.deviceNo
+            data: {
+              skey: res.data.skey,
+              deviceNO: that.data.deviceNo
             },
             success: (res) => {
-              console.log(res);
+              console.log("资金冻结访问自己服务器成功");
               that.alipayFreezing(res.data.data.orderStr);
             },
           });
         }
-      },fail:function(res){
+      }, fail: function(res) {
+        
         my.hideLoading();
       }
     })
-
-
-    // my.httpRequest({
-    //   // url: app.constants.ip + "/alipay/user/firstPage/scanBorrow", // 目标服务器url
-    //   url: app.constants.ip + "/alipay/user/firstPage/fundFreeze", // 目标服务器url
-    //   data:{
-    //     skey:"787878",
-    //     deviceNO:"123456"
-    //   },
-    //   success: (res) => {
-    //     console.log("scanBorrow:"+res.data.data.orderStr);
-    //     that.alipayFreezing(res.data.data.orderStr);
-    //   },fail:function(res){
-    //     console.log(JSON.stringify(res));
-    //   },complete:function(res){
-    //     my.hideLoading();
-    //   }
-    // });
-
   },
   alipayFreezing: function(orderStr) {
-    console.log("zhb:"+orderStr);
+    var that = this;
     my.tradePay({
       orderStr: orderStr,
       success: (res) => {
         my.hideLoading();
-        my.alert({
-          content: JSON.stringify(res),
-        });
-
+        // my.alert({
+        //   content: res,
+        // });
+        //资金冻结成功，申请借充电宝
+        console.log("资金冻结成功，用户借用充电宝");
+        that.borrowCB();
       }, fail: function(res) {
         my.hideLoading();
         my.alert({
@@ -409,100 +398,204 @@ Page({
   },
   borrowCB:function(res){
     var that = this;
-    that.showLoading();
-    my.httpRequest({
-      url: app.constants.ip + "/alipay/user/firstPage/scanBorrow",
-      data: {
-        skey: userinfo.skey,
-        deviceNO: that.data.deviceNo
-      },
-      success: function(res) {
-        console.log(res);
-        if (res.data.flag == "1" && res.data.code == "1") { //用户可借用充电宝
-          wx.redirectTo({
-            url: '/pages/billing/index',
-          })
-          wx.showModal({
-            title: '充电宝已弹出',
-            content: '请及时取走您的充电宝!',
-            success: function(e) {
-            },
-            fail: function(e) {
-              console.log(e);
-            }
-          })
-        } else if (res.data.flag == "0" && res.data.code == "1") {  //用户不能借用充电宝，1.用户未交押金，2.用户有未支付的订单，3.用户有正在借用的订单。
-          that.setData({
-            killShake: false,
-          })
-          if (res.data.data == null || res.data.data == '') { //如果data数据为空，则表示押金未交或无充电宝可借
-            if (res.data.msg === '当前充电箱无法借出充电宝') {//无充电宝可借
-              wx.showModal({
+    my.showLoading();
+    my.getStorage({
+      key: app.constants.userinfo,
+      success:function(res){
+        if(res.data==null)return;
+        my.httpRequest({
+          url: app.constants.ip + "/alipay/user/firstPage/scanBorrow",
+          data: {
+            skey: res.data.skey,
+            deviceNO: that.data.deviceNo,
+            formId1: that.data.formId1,
+            formId2: that.data.formId2,
+          },
+          success: function(res) {
+            console.log("借用充电宝借口访问成功：" + JSON.stringify(res));
+            if (res.data.flag == "1" && res.data.code == "1") { //用户可借用充电宝
+              console.log("弹出充电宝成功");
+              my.redirectTo({
+                url: '/pages/billing/index',
+              })
+              my.confirm({
+                title: '温馨提示',
+                content: '充电宝已弹出，请及时取走您的充电宝!',
+              })
+            } else if (res.data.flag == "0" && res.data.code == "1") {  //用户不能借用充电宝，1.用户未交押金，2.用户有未支付的订单，3.用户有正在借用的订单。
+              console.log("用户不能借用充电宝");
+              that.setData({
+                killShake: false,
+              })
+              if (res.data.data == null || res.data.data == '') { //如果data数据为空，则表示押金未交或无充电宝可借
+                if (res.data.msg === '当前充电箱无法借出充电宝') {//无充电宝可借
+                  my.confirm({
+                    title: res.data.msg,
+                    content: '',
+                  })
+                } else {  //押金未交
+                  my.redirectTo({
+                    url: '/pages/deposit/index',
+                  })
+                }
+
+              } else {
+                if (res.data.data.order != undefined && res.data.data.order.powerBankStatus == "0") { //powerBankStatus=0表示正在充电
+                  my.confirm({
+                    title: '借用充电宝失败',
+                    content: '您有正在进行的订单',
+                  })
+                  //powerBankStatus=1用户已还充电宝，payStatus=0表示有未支付
+                  ////powerBankStatus=1并且payStatus=0表示有未支付的订单
+                } else if (res.data.data.powerBankStatus == "1" && res.data.data.payStatus == "0") {
+                  if (res.data.data.payAmount != "0") {
+                    my.confirm({
+                      title: '您有未支付的订单',
+                      content: '是否立即支付',
+                      success: function(e) {
+                        if (e.confirm) //用户点击了确定按钮
+                          that.handleOrder(res.data.data.payAmount);
+                      }
+                    })
+                  }
+                }
+              }
+            } else if (res.data.flag == "0" && res.data.code == "0") {
+              my.confirm({
+                title: '借出充电宝失败',
+                content: res.data.msg,
+              })
+              that.setData({
+                killShake: false,
+              })
+            } else {
+              that.setData({
+                killShake: false,
+              })
+              my.confirm({
                 title: res.data.msg,
                 content: '',
               })
-            } else {  //押金未交
-              wx.redirectTo({
-                url: '/pages/deposit/index',
+            }
+          },
+          fail: function(res) {
+            console.log(res)
+            that.setData({
+              killShake: false,
+            })
+            my.showToast({
+              title: '借用充电宝失败，请稍后重试',
+              duration: 3000,
+            })
+          },
+          complete: function(res) {
+            my.hideLoading();
+          },
+        });
+      },fail:function(res){
+
+      }
+    })
+  },
+  submitInfo: function(e) {
+    var that = this;
+    var formId = e.detail.formId;
+    this.data.formId2 = formId;
+    console.log("submitInfo," + formId);
+    // this.zjdj();  //获取formId 后再告诉后台借用充电宝
+    //检测是否有正在进行的订单
+    that.checkOrder();
+  },
+  formSubmit: function(e) {
+    var formId = e.detail.formId;
+    this.data.formId1 = formId;
+    console.log("formSubmit," + formId);
+  },
+  checkOrder: function(res) {
+    var that = this;
+    my.getStorage({
+      key: app.constants.userinfo,
+      success: function(res) { //表示用户已登录，可进行扫码
+        var userinfo = res.data;
+        //先访问接口是否正在充电，防止多次借用充电宝
+        my.showLoading({
+          success: (res) => {
+            
+          },
+        });
+        my.httpRequest({
+          url: app.constants.ip + "/alipay/user/firstPage/userStatus/doesUserHaveOrderDoing",
+          data: {
+            skey: userinfo.skey,
+          },
+          header: {},
+          method: 'POST',
+          dataType: 'json',
+          responseType: 'text',
+          success: function(res) {
+            console.log(JSON.stringify(res));
+            if (res.data.flag == "0") { //没有正在进行的订单
+              that.checkPayStatus(userinfo.skey);
+            } else if (res.data.flag == "1") { //有正在进行的订单
+              my.confirm({
+                title:"温馨提示",
+                content:"您有正在借用的充电宝，不能重复借用"
               })
             }
+          },
+          fail: function(res) { },
+          complete: function(res) { my.hideLoading();},
+        })
 
-          } else {
-            if (res.data.data.order != undefined && res.data.data.order.powerBankStatus == "0") { //powerBankStatus=0表示正在充电
-              wx.showModal({
-                title: '借用充电宝失败',
-                content: '您有正在进行的订单',
-                success: function(e) {
-                }
-              })
-              //powerBankStatus=1用户已还充电宝，payStatus=0表示有未支付
-              ////powerBankStatus=1并且payStatus=0表示有未支付的订单
-            } else if (res.data.data.powerBankStatus == "1" && res.data.data.payStatus == "0") {
-              if (res.data.data.payAmount != "0") {
-                wx.showModal({
-                  title: '您有未支付的订单',
-                  content: '是否立即支付',
-                  success: function(e) {
-                    if (e.confirm) //用户点击了确定按钮
-                      that.handleOrder(res.data.data.payAmount);
-                  }
+      },
+      fail: function() {    //用户未登录，跳转到登录界面
+
+      }
+    })
+  },
+  checkPayStatus: function(skey) {
+    var that = this;
+    my.httpRequest({
+      url: app.constants.ip + "/alipay/user/firstPage/userStatus/doesUserHaveOrderUnpaid",
+      data: {
+        skey: skey,
+      },
+      header: {},
+      method: 'POST',
+      dataType: 'json',
+      responseType: 'text',
+      success: function(res) {
+        console.log(res);
+        if (res.data.flag == "0") { //没有欠费的订单，即可退押金
+          console.log("用户没有欠费的订单");
+          that.zjdj();
+        } else if (res.data.flag == "1") { //有欠费的订单，调起支付接口
+
+          my.confirm({
+            title: '温馨提示',
+            content: '您有未支付的订单,是否立即支付',
+            confirmButtonText: "确定",
+            success: function(e) {
+              if (e.confirm) { //用户点击了确定按钮
+                that.handleOrder(res.data.data.payAmount);
+              } else {
+                that.setData({
+                  killShake: false,
                 })
               }
             }
-          }
-        } else if (res.data.flag == "0" && res.data.code == "0") {
-          wx.showModal({
-            title: '借出充电宝失败',
-            content: res.data.msg,
           })
-          that.setData({
-            killShake: false,
-          })
-        } else {
-          that.setData({
-            killShake: false,
-          })
-          wx.showModal({
-            title: res.data.msg,
-            content: '',
-          })
+
         }
       },
       fail: function(res) {
-        console.log(res)
+        wx.hideLoading();
         that.setData({
           killShake: false,
         })
-        wx.showToast({
-          title: '借用充电宝失败，请稍后重试',
-          duration: 3000,
-        })
       },
       complete: function(res) {
-        wx.hideLoading();
-
       },
-    });
+    })
   }
-
 })

@@ -37,23 +37,19 @@ Page({
    */
   onLoad: function (options) {
     var that = this;
-    wx.setNavigationBarTitle({
-      title: '充电记录',
-    })
     console.log("" + this.data.chargingRecordList.length);
-    
     //访问后台获取充电记录
-    wx.getStorage({
+    my.getStorage({
       key: app.constants.userinfo,
       success: function (res) {
-        var userinfo = JSON.parse(res.data);
+        var userinfo = res.data;
         
         //获取skey成功，访问接口获取数据
-        wx.showLoading({
+        my.showLoading({
           title: '',
         })
-        wx: wx.request({
-          url: app.constants.ip + "/wechat/user/firstPage/personalCenter/chargingRecord",
+        my.httpRequest({
+          url: app.constants.ip + "/alipay/user/firstPage/personalCenter/chargingRecord",
           data: {
             skey: userinfo.skey,
           },
@@ -72,7 +68,7 @@ Page({
           fail: function (res) { 
             console.log(res);
           },
-          complete: function (res) { wx.hideLoading()},
+          complete: function (res) { my.hideLoading()},
         })
       },
     })
