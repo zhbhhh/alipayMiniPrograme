@@ -266,7 +266,7 @@ Page({
                 } else if (res.data.data.transactionSource == "6") {//支付方式为资金冻结自动扣除
                   my.confirm({
                     title: '充电宝归还成功',
-                    content: '本次消费' + res.data.data.payAmount + '元，已从冻结资金中扣除，剩余的金额已原路退回至您的账户中。',
+                    content: '本次消费' + res.data.data.payAmount + '元，已自动扣除，如有冻结的资金，将原路退回至您的账户中。',
                   })
                 }
               } else { //表示未支付

@@ -132,7 +132,10 @@ Page({
             console.log("计时页面：：" + JSON.stringify(res))
             if (res.data.flag == "1") { //用户可借用充电宝,表示充电宝已归还
               clearInterval(that.data.timer);//清楚计时器
-              //恢复扫码充电图标
+              that.setData({
+                billing: "本次充电耗时",
+                disabled: true
+              })
               //处理订单结果
               if (res.data.data.payStatus == "1") {  //表示已支付
                 if (res.data.data.transactionSource == "3") {//3表示交易源为余额,4表示免费
@@ -148,7 +151,7 @@ Page({
                 } else if (res.data.data.transactionSource == "6") {//支付方式为资金冻结自动扣除
                   my.confirm({
                     title: '充电宝归还成功',
-                    content: '本次消费' + res.data.data.payAmount + '元，已从冻结资金中扣除，剩余的金额已原路退回至您的账户中。',
+                    content: '本次消费' + res.data.data.payAmount + '元，已自动扣除，如有冻结资金，将原路退回至您的账户中。',
                   })
                 }
               } else { //表示未支付

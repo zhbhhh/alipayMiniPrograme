@@ -10,7 +10,7 @@ App({
   constants:{
     userinfo:"userinfo",
     serverPhoneNo:"076985251988",
-    version:"v1.0.5",
+    version:"v1.0.6",
     ip:"http://www.qdtechwx.com:8081",
     // ip:"http://192.168.0.112:8081",
     // ip:"http://192.168.0.105:8081",
