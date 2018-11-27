@@ -7,7 +7,7 @@
 
 </view>
 
-<view class="userinfo-style1 tapbar" onTap="wallet">
+<view class="userinfo-style1 tapbar" hidden="true" onTap="wallet">
    <view>
     <image style="width:60rpx;height:60rpx;" src="/images/wallet.png"></image>
     <text>押金状态</text>

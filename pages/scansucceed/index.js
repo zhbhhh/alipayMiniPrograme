@@ -243,6 +243,18 @@ Page({
             },
             success: (res) => {
               console.log("资金冻结访问自己服务器成功"+JSON.stringify(res));
+              if(res.data.code == 0 && res.data.flag == 0 && res.data.msg == "用户不存在"){
+                my.removeStorage({
+                  key: app.constants.userinfo, // 缓存数据的key
+                  success: (res) => {
+                    
+                  },
+                });
+                my.redirectTo({
+                  url:"/pages/login/index"
+                })
+                return;
+              }
               that.alipayFreezing(res.data.data);
             },
           });

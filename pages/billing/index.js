@@ -146,7 +146,7 @@ Page({
                 } else if (res.data.data.transactionSource == "4") {//本次充电免费
                   my.confirm({
                     title: '充电宝归还成功',
-                    content: '本次充电免费',
+                    content: '本次充电免费,如有冻结资金，将原路退回至您的账户中。',
                   })
                 } else if (res.data.data.transactionSource == "6") {//支付方式为资金冻结自动扣除
                   my.confirm({
