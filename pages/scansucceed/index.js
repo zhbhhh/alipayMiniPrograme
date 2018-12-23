@@ -32,22 +32,17 @@ Page({
   onLoad: function (options) {
     var that = this;
     // this.checkSession();
-    console.log("扫码::"+JSON.stringify(options));
     // var q = "";
     if (JSON.stringify(options) == "{}"){
-      console.log("111111");
      var q = app.data.qrCode;
     }else{
-      console.log("2222222");
      var q = options.q;
     }
     // var q = options.q;
-    console.log("二维码："+q);
     if (q != "undefined" && q !="") {
       // console.log("全局onLaunch onload url=" + q)
       // console.log("全局onLaunch onload 参数 flag=" + utils.getQueryString(q, 'sn'))
       var deviceNo = utils.getQueryString(q, 'sn');
-      console.log("deviceNo::::"+deviceNo);
       that.setData({
         deviceNo:deviceNo
       });
@@ -62,7 +57,6 @@ Page({
         dataType: 'json',
         responseType: 'text',
         success: function (res) {
-          console.log("成功:"+res)
           if (res.data.code == "1") {
             that.setData({
               money: res.data.data.pricePerHour,
@@ -70,7 +64,6 @@ Page({
               maxCost: res.data.data.topPricePerDay,
             })
           }
-          console.log(res)
         },
         fail: function (res) {
           console.log("错误："+res);
@@ -149,7 +142,6 @@ Page({
           responseType: 'text',
           success: function (res) {
             if (res.data.code == "1") {
-              console.log(res);
               wx.requestPayment({
                 timeStamp: res.data.data.timeStamp,
                 nonceStr: res.data.data.nonceStr,
@@ -157,8 +149,6 @@ Page({
                 signType: res.data.data.signType,
                 paySign: res.data.data.paySign,
                 success: function (e) { //支付成功
-                  console.log(e)
-                  
                   // wx.redirectTo({
                   //   url: '/pages/rechargesucced/index?amount=' + that.data.money,
                   // })
@@ -188,7 +178,6 @@ Page({
     })
   },
   getQrInfo: function (options){
-    console.log("全局onLaunch options==" + JSON.stringify(options))
     var q = decodeURIComponent(options.q)
     // var q = "http://www.joyfive.club/file/q?sn=1234"
     if (q) {
@@ -242,7 +231,6 @@ Page({
               deviceNO: that.data.deviceNo
             },
             success: (res) => {
-              console.log("资金冻结访问自己服务器成功"+JSON.stringify(res));
               if(res.data.code == 0 && res.data.flag == 0 && res.data.msg == "用户不存在"){
                 my.removeStorage({
                   key: app.constants.userinfo, // 缓存数据的key
@@ -267,7 +255,6 @@ Page({
   },
   alipayFreezing: function(orderStr) {
     var that = this;
-    console.log("orderStr::"+orderStr);
     my.tradePay({
       orderStr: orderStr,
       success: (res) => {
@@ -275,11 +262,19 @@ Page({
         // my.alert({
         //   content: res,
         // });
-        // console.log(res);
         //资金冻结成功，申请借充电宝
+        
+        console.log("资金冻结成功："+res.result);
+
+        var resultT = JSON.parse(res.result);
+        console.log("资金冻结成功info：" + resultT.sign_type);
+        console.log("资金冻结成功sign：" + resultT.alipay_fund_auth_order_app_freeze_response.auth_no);
+        console.log("资金冻结成功sign：" + resultT.alipay_fund_auth_order_app_freeze_response.pre_auth_type);
+        console.log("资金冻结成功sign：" + resultT.alipay_fund_auth_order_app_freeze_response.operation_id);
+
         console.log("资金冻结成功，用户借用充电宝");
         if(res.resultCode == 9000){
-          that.borrowCB();
+          that.borrowCB(resultT.alipay_fund_auth_order_app_freeze_response.auth_no, resultT.alipay_fund_auth_order_app_freeze_response.pre_auth_type, resultT.alipay_fund_auth_order_app_freeze_response.operation_id);
         }else{  //支付失败，恢复状态
           that.setData({
             killShake: false,
@@ -294,7 +289,7 @@ Page({
       }
     });
   },
-  borrowCB:function(res){
+  borrowCB:function(auth_no,pre_auth_type,operation_id){
     var that = this;
     my.showLoading();
     my.getStorage({
@@ -308,9 +303,12 @@ Page({
             deviceNO: that.data.deviceNo,
             formId1: that.data.formId1,
             formId2: that.data.formId2,
+            auth_no:auth_no,
+            pre_auth_type:pre_auth_type,
+            operation_id:operation_id,
           },
           success: function(res) {
-            console.log("借用充电宝借口访问成功：" + JSON.stringify(res));
+            // console.log("借用充电宝借口访问成功：" + JSON.stringify(res));
             if (res.data.flag == "1" && res.data.code == "1") { //用户可借用充电宝
               console.log("弹出充电宝成功");
               my.redirectTo({
@@ -440,7 +438,7 @@ Page({
           dataType: 'json',
           responseType: 'text',
           success: function(res) {
-            console.log(JSON.stringify(res));
+            // console.log(JSON.stringify(res));
             if (res.data.flag == "0") { //没有正在进行的订单
               that.checkPayStatus(userinfo.skey);
             } else if (res.data.flag == "1") { //有正在进行的订单
@@ -472,7 +470,7 @@ Page({
       dataType: 'json',
       responseType: 'text',
       success: function(res) {
-        console.log(res);
+        // console.log(res);
         if (res.data.flag == "0") { //没有欠费的订单，即可退押金
           console.log("用户没有欠费的订单");
           that.zjdj();
